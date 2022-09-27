@@ -8,15 +8,23 @@ export function Cardboard(props){
     const [src, setSrc] = useState([]); 
     const [names, setNames] = useState([]);
     const [stored, setStored] = useState([]);
+    const [level, setLevel] = useState(0);
+
+    //Number of pics by level
+    let numPics = [4, 6, 8, 10, 13, 15, 20];
+
     let render = [];
+    let randomPage = Math.floor(Math.random() * 40 + 1);
 
     async function getChar() 
-    {fetch('https://rickandmortyapi.com/api/character/?page=2')
+    {fetch(`https://rickandmortyapi.com/api/character/?page=${randomPage}`)
     .then(data => data.json())
     .then(data => {
+        console.log(randomizer())
+        setStored([]);
         let urls = [];
         let n = [];
-        for(let i = 0; i < 4; i++){
+        for(let i = 0; i < numPics[level]; i++){
             urls.push(data.results[i].image);
             n.push(data.results[i].name);
         }
@@ -27,7 +35,7 @@ export function Cardboard(props){
     
     useEffect(() => {
         getChar()
-    }, [])
+    }, [level])
 
     useEffect(() => {
         let images = document.querySelectorAll('img');
@@ -40,20 +48,41 @@ export function Cardboard(props){
 
     const fun = (e) => {
         let urls = src;
+        let urlsCopy = [];
         let n = names;
-        let randomNum = Math.floor(Math.random() * 3)
-        urls.splice(randomNum,0,urls.pop());
-        n.splice(randomNum, 0, n.pop());
-        setSrc([...urls]);
-        setNames([...n]);
+        let nCopy = [];
+        let arr = randomizer();
+        
+        arr.forEach((pos) => {
+            urlsCopy.push(urls[pos]);
+            nCopy.push(n[pos]);
+        })
+        
+        setSrc([...urlsCopy]);
+        setNames([...nCopy]);
         checkLose(e);
         store(e);
         checkWin();
     }
 
-    for(let i = 0; i < 4; i++){
+    const randomizer = () => {
+        let arr = [];
+        let max = numPics[level];
+        let random;
+        for(let i = 0; i < max; i++){
+            do{
+                random = Math.floor(Math.random() * max);
+            }while(arr.includes(random));
+            arr.push(random);
+        }
+        console.log(arr)
+        return arr;
+    }
+
+    for(let i = 0; i < numPics[level]; i++){
         render.push(<Card name={names[i]} src={src[i]}></Card>)
     }
+
 
     const checkLose = (e) => {
         if(stored.includes(e.target.id)){
@@ -63,19 +92,19 @@ export function Cardboard(props){
 
     const store = (e) =>{
         let arr = stored;
-        arr.push(e.target.id)
+        arr.push(e.target.src)
         setStored(arr)
     }
 
     const checkWin = () => {
-        let counter = 0;
         if(stored.length === names.length){
+            setLevel(level + 1);
             console.log('You win!')
         }
     }
 
     return (
-    <div>
+    <div className="cardBoard">
         {render}    
     </div>)
 }

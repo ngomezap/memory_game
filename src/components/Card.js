@@ -3,5 +3,8 @@ import '../styles/Card.css'
 
 export function Card(props){
 
-    return (<img id={props.name} src={props.src}/>)
+    return (
+    <div>
+        <img id={props.name} src={props.src}/>
+    </div>)
 }
