@@ -1,7 +1,13 @@
+html, body{
+    width: 100%;
 
+}
 
 .cardBoard{
+    padding: 5%;
+    flex-wrap: wrap;
     display: flex;
-    width: 50%;
-    justify-content: space-between;
+    flex-direction: row;
+    justify-content: center;
+    width: 90%;
 }

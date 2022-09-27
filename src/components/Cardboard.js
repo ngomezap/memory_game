@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { Card } from "./Card";
+import { Score } from "./Score";
 import '../styles/Cardboard.css'
 
 
@@ -9,6 +10,7 @@ export function Cardboard(props){
     const [names, setNames] = useState([]);
     const [stored, setStored] = useState([]);
     const [level, setLevel] = useState(0);
+    const [count, setCount] = useState(0);
 
     //Number of pics by level
     let numPics = [4, 6, 8, 10, 13, 15, 20];
@@ -20,7 +22,6 @@ export function Cardboard(props){
     {fetch(`https://rickandmortyapi.com/api/character/?page=${randomPage}`)
     .then(data => data.json())
     .then(data => {
-        console.log(randomizer())
         setStored([]);
         let urls = [];
         let n = [];
@@ -60,9 +61,20 @@ export function Cardboard(props){
         
         setSrc([...urlsCopy]);
         setNames([...nCopy]);
-        checkLose(e);
-        store(e);
-        checkWin();
+        if(checkLose(e)){
+            if(level !== 0){
+                setLevel(0);
+                setCount(0);
+            }else{
+                setStored([]);
+                setCount(0);
+                getChar();
+            }
+        }else{
+            setCount(count + 1);
+            store(e);
+            checkWin();
+        }
     }
 
     const randomizer = () => {
@@ -75,7 +87,6 @@ export function Cardboard(props){
             }while(arr.includes(random));
             arr.push(random);
         }
-        console.log(arr)
         return arr;
     }
 
@@ -85,8 +96,10 @@ export function Cardboard(props){
 
 
     const checkLose = (e) => {
-        if(stored.includes(e.target.id)){
-            console.log('You lose!')
+        if(stored.includes(e.target.src)){
+            return true;
+        }else{
+            return false;
         }
     }
 
@@ -105,6 +118,7 @@ export function Cardboard(props){
 
     return (
     <div className="cardBoard">
+        <Score count={count} level={level + 1}></Score>
         {render}    
     </div>)
 }
